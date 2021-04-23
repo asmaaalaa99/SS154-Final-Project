@@ -4,3 +4,4 @@ tables/regression_1.txt
 *.TEX
 *.tex 
 *.pdf
+*.gph

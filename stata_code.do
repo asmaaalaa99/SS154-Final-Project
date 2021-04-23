@@ -47,3 +47,7 @@ mat rownames A = `r(name_1)' `r(name_2)' `r(name_3)' `r(name_4)' `r(name_5)' "Me
 mat colnames A = VIF 1/VIF
 
 frmttable using "vif_test.tex", statmat(A) sdec(2) varlabels tex fragment nocenter replace
+
+histogram log_population, normal
+
+histogram md_earn_wne_p6, normal
