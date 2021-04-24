@@ -7,11 +7,11 @@ gen log_population = ln(population_2019)
 est clear  
 
 * Generate summary stats 
-estpost tabstat md_earn_wne_p6 log_population grad_debt_mdn first_gen married adm_rate sat_avg poverty_rate ln_median_hh_inc costt4_a ugds_white , c(stat) stat(sum mean sd min max n)
+estpost tabstat md_earn_wne_p6 md_earn_wne_p8 md_earn_wne_p10 log_population grad_debt_mdn first_gen married adm_rate sat_avg poverty_rate median_hh_inc costt4_a ugds_white , c(stat) stat(sum mean sd min max n)
 esttab, ///
  cells("sum(fmt(%13.0fc)) mean(fmt(%13.2fc)) sd(fmt(%13.2fc)) min max count") nonumber ///
   nomtitle nonote noobs label collabels("Sum" "Mean" "SD" "Min" "Max" "N")
-esttab using "summary_stats.tex", replace ////
+esttab using "/Users/asmaaaly/Minerva/SF_spring/SS154/SS154-assignment/tables/summary_stats.tex", replace ////
  cells("sum(fmt(%13.0fc)) mean(fmt(%13.2fc)) sd(fmt(%13.2fc)) min max count") nonumber ///
   nomtitle nonote noobs label booktabs f ///
   collabels("Sum" "Mean" "SD" "Min" "Max" "N")
@@ -20,8 +20,11 @@ esttab using "summary_stats.tex", replace ////
 * Build the regression model and save the results 
 
 est clear
-eststo: regress md_earn_wne_p6 log_population ln_median_hh_inc costt4_a ugds_white first_gen, robust
-esttab using "regression_1.tex", replace  ///
+eststo: regress md_earn_wne_p6 log_population median_hh_inc costt4_a ugds_white first_gen, robust
+eststo: regress md_earn_wne_p8 log_population median_hh_inc costt4_a ugds_white first_gen, robust
+eststo: regress md_earn_wne_p10 log_population median_hh_inc costt4_a ugds_white first_gen, robust
+
+esttab using "/Users/asmaaaly/Minerva/SF_spring/SS154/SS154-assignment/tables/regression_1.tex", replace  ///
  b(3) se(3) nomtitle label star(* 0.10 ** 0.05 *** 0.01) ///
  booktabs alignment(D{.}{.}{-1}) ///
  title(My very first basic regression table \label{reg1})   ///
@@ -35,8 +38,13 @@ rvfplot, yline(0)
 * Generate the vif table 
 
 est clear  
-regress md_earn_wne_p6 log_population ln_median_hh_inc costt4_a ugds_white first_gen, robust
+regress md_earn_wne_p6 log_population median_hh_inc costt4_a ugds_white first_gen, robust
 eststo: vif
+regress md_earn_wne_p8 log_population median_hh_inc costt4_a ugds_white first_gen, robust
+eststo: vif
+regress md_earn_wne_p10 log_population median_hh_inc costt4_a ugds_white first_gen, robust
+eststo: vif
+
 
 mat A = `r(vif_1)', 1/`r(vif_1)' \ `r(vif_2)', 1/`r(vif_2)' \ `r(vif_3)', 1/`r(vif_3)' \ `r(vif_4)', 1/`r(vif_4)' \ `r(vif_5)', 1/`r(vif_5)'
 mat B = A[1...,1]               // extract first column in order to compute mean
@@ -46,8 +54,15 @@ mat A = A\ vifmean, .           // append A by vifmean
 mat rownames A = `r(name_1)' `r(name_2)' `r(name_3)' `r(name_4)' `r(name_5)' "Mean VIF"
 mat colnames A = VIF 1/VIF
 
-frmttable using "vif_test.tex", statmat(A) sdec(2) varlabels tex fragment nocenter replace
+frmttable using "/Users/asmaaaly/Minerva/SF_spring/SS154/SS154-assignment/tables/vif_test.tex", statmat(A) sdec(2) varlabels tex fragment nocenter replace
 
 histogram log_population, normal
+histogram population_2019, normal
 
 histogram md_earn_wne_p6, normal
+
+regress md_earn_wne_p6 median_hh_inc
+rvfplot, yline(0)
+
+regress md_earn_wne_p6 ln_median_hh_inc
+rvfplot, yline(0)
